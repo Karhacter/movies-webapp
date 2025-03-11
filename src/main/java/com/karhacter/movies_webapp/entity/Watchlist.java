@@ -1,6 +1,7 @@
 package com.karhacter.movies_webapp.entity;
 
 import java.util.Date;
+import lombok.*;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,12 +12,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 
 @Entity
+@Getter
+@Setter
 @Table(name = "watchlist")
 @NoArgsConstructor
+@Data
 @AllArgsConstructor
 public class Watchlist {
     @Id
