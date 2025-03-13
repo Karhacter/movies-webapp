@@ -23,6 +23,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -60,6 +61,9 @@ public class Movie {
     @DecimalMin("0.0")
     @DecimalMax("10.0")
     private double rating;
+
+    @Positive
+    private int tokens;
 
     @NotBlank
     private String videoUrl;

@@ -38,15 +38,30 @@ public class MovieController {
         return new ResponseEntity<>(savedMovieDTO, HttpStatus.CREATED);
     }
 
+    // get all movies
     @GetMapping("/index")
     public List<MovieDTO> getAllMovies() {
         return movieService.getAllMovies();
     }
 
+    // get one movie
     @GetMapping("/detail/{id}")
     public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
         MovieDTO detailMovieDTO = movieService.getMovieById(id);
         return new ResponseEntity<>(detailMovieDTO, HttpStatus.OK);
     }
 
+    // update movie
+    @PostMapping("/update/{id}")
+    public ResponseEntity<MovieDTO> updateMovie(@PathVariable Long id, @Valid @RequestBody Movie movie) {
+        MovieDTO updatedMovieDTO = movieService.updateMovie(id, movie);
+        return new ResponseEntity<>(updatedMovieDTO, HttpStatus.OK);
+    }
+
+    // delete movie
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<String> deleteMovie(@PathVariable Long id) {
+        String message = movieService.deleteMovie(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
 }

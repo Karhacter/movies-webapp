@@ -14,6 +14,7 @@ public class MovieDTO {
     private String description;
     private Date releaseDate;
     private int duration;
+    private int tokens;
     private double rating;
     private String videoUrl;
     private Long categoryId; // Thêm categoryId
