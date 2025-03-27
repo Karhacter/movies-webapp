@@ -1,18 +1,18 @@
 package com.karhacter.movies_webapp.controller;
 
-import com.karhacter.movies_webapp.config.AppConstant;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.karhacter.movies_webapp.entity.Movie;
 import com.karhacter.movies_webapp.payloads.MovieDTO;
-import com.karhacter.movies_webapp.payloads.MovieResponse;
 import com.karhacter.movies_webapp.service.MovieService;
 
 import jakarta.validation.Valid;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/api/")
 @CrossOrigin(origins = "*")
 public class MovieController {
+    private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
 
     @Autowired
     private MovieService movieService;
@@ -43,20 +44,29 @@ public class MovieController {
 
     // get all movies
     @GetMapping("movies/index")
-    public ResponseEntity<MovieResponse> getAllMovies(
-            @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
-            @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
-            @RequestParam(name = "sortBy", defaultValue = AppConstant.SORT_MOVIES_BY, required = false) String sortBy,
-            @RequestParam(name = "sortOrder", defaultValue = AppConstant.SORT_DIR, required = false) String sortOrder) {
+    public ResponseEntity<Page<MovieDTO>> getAllMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "rating") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        pageNumber = pageNumber > 0 ? pageNumber - 1 : 0;
+        logger.info("Received request for movies - Page: {}, Size: {}, SortBy: {}, SortOrder: {}",
+                page, size, sortBy, sortOrder);
 
-        MovieResponse movieResponse = movieService.getAllMovies(
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortOrder);
-        return new ResponseEntity<MovieResponse>(movieResponse, HttpStatus.OK);
+        // Ensure page is not negative
+        page = Math.max(0, page);
+
+        Sort sort = sortOrder.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<MovieDTO> movies = movieService.getAllMovies(pageable);
+
+        logger.info("Returning movies - Current Page: {}, Total Pages: {}, Total Elements: {}",
+                movies.getNumber(), movies.getTotalPages(), movies.getTotalElements());
+
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     // get one movie

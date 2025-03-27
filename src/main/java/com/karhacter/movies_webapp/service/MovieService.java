@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.entity.Movie;
 import com.karhacter.movies_webapp.payloads.MovieDTO;
-import com.karhacter.movies_webapp.payloads.MovieResponse;
 import com.karhacter.movies_webapp.payloads.MovieStatsDTO;
 
 public interface MovieService {
@@ -15,7 +14,8 @@ public interface MovieService {
     MovieDTO createMovie(Long categoryId, Movie movie);
 
     // optional 2: use MovieResponse
-    MovieResponse getAllMovies(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+
+    Page<MovieDTO> getAllMovies(Pageable pageable);
 
     // get one movie
     MovieDTO getMovieById(Long id);
@@ -40,15 +40,7 @@ public interface MovieService {
 
     // Update main poster image
     MovieDTO updateMainImage(Long movieId, String newImageUrl);
-
-    // update token when user purchase token to watch ep movie
-    // get new movies
-    // get the top 10 movies
-    // random movie
-    // get all movies by year
-    // get all movies if movie title contains the search keyword
-    // get all movies between the tv/series and Movie/Ova
-
+    
     // Get overall movie statistics
     MovieStatsDTO getMovieStatistics();
 
@@ -74,5 +66,5 @@ public interface MovieService {
     List<MovieDTO> getMoviesByDurationRange(int minDuration, int maxDuration);
 
     // Search movies by keyword
-    MovieResponse searchMovies(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder, String keyword);
+    
 }
