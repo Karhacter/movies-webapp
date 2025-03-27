@@ -13,7 +13,10 @@ import com.karhacter.movies_webapp.payloads.EpisodeDTO;
 import com.karhacter.movies_webapp.repository.EpsiodeRepo;
 import com.karhacter.movies_webapp.service.EpisodeService;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class EpisodeServiceImpl implements EpisodeService {
     @Autowired
     private EpsiodeRepo episodeRepo;
@@ -23,7 +26,8 @@ public class EpisodeServiceImpl implements EpisodeService {
 
     @Override
     public EpisodeDTO createEp(Episode episode) {
-        Optional<Episode> existedEpisode = Optional.ofNullable(episodeRepo.findByEpNumber(episode.getEpisodeNumber()));
+        Optional<Episode> existedEpisode = Optional
+                .ofNullable(episodeRepo.findByEpisodeNumber(episode.getEpisodeNumber()));
         if (existedEpisode.isPresent()) {
             throw new APIException("Episode with the number '" + episode.getEpisodeNumber() + "' already exists !!!");
         }

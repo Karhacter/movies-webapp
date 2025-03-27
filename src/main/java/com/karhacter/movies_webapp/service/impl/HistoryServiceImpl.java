@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.karhacter.movies_webapp.entity.History;
 import com.karhacter.movies_webapp.entity.Movie;
 import com.karhacter.movies_webapp.entity.User;
-import com.karhacter.movies_webapp.payloads.HistoryDTO;
 import com.karhacter.movies_webapp.repository.HistoryRepo;
 import com.karhacter.movies_webapp.repository.MovieRepo;
 import com.karhacter.movies_webapp.repository.UserRepo;
@@ -27,9 +26,9 @@ public class HistoryServiceImpl implements HistoryService {
     private MovieRepo movieRepository;
 
     @Override
-    public List<HistoryDTO> getUserHistory(Long userId) {
+    public List<History> getUserHistory(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        return historyRepo.findByUserDTO(user);
+        return historyRepo.findByUser(user);
     }
 
     @Override

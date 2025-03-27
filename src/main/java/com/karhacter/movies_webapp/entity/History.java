@@ -37,11 +37,11 @@ public class History {
     @Column(name = "last_watched")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastWatched = new Date();
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnore

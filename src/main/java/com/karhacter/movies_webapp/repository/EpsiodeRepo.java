@@ -6,5 +6,5 @@ import com.karhacter.movies_webapp.entity.Episode;
 
 @Repository
 public interface EpsiodeRepo extends JpaRepository<Episode, Long> {
-    Episode findByEpNumber(Integer episodeNumber);
+    Episode findByEpisodeNumber(Integer episodeNumber);
 }

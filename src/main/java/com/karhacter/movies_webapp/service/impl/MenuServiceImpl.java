@@ -5,14 +5,15 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.karhacter.movies_webapp.entity.Menu;
 import com.karhacter.movies_webapp.exception.APIException;
-import com.karhacter.movies_webapp.payloads.CategoryDTO;
 import com.karhacter.movies_webapp.payloads.MenuDTO;
 import com.karhacter.movies_webapp.repository.MenuRepo;
 import com.karhacter.movies_webapp.service.MenuService;
 
+@Service
 public class MenuServiceImpl implements MenuService {
 
     @Autowired
@@ -24,7 +25,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public MenuDTO createMenu(Menu menu) {
         Optional<Menu> existingCategory = Optional
-                .ofNullable(menuRepo.findByName(menu.getMenuName()));
+                .ofNullable(menuRepo.findByMenuName(menu.getMenuName()));
 
         if (existingCategory.isPresent()) {
             throw new APIException("Category with the name '" +
@@ -46,19 +47,19 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuDTO getMenuById(Long menuId) {
-        // TODO Auto-generated method stub
+
         throw new UnsupportedOperationException("Unimplemented method 'getMenuById'");
     }
 
     @Override
     public MenuDTO updateMenu(Long menuId, MenuDTO menuDTO) {
-        // TODO Auto-generated method stub
+       
         throw new UnsupportedOperationException("Unimplemented method 'updateMenu'");
     }
 
     @Override
     public String deleteMenu(Long menuId) {
-        // TODO Auto-generated method stub
+        
         throw new UnsupportedOperationException("Unimplemented method 'deleteMenu'");
     }
 

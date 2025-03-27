@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karhacter.movies_webapp.entity.History;
-import com.karhacter.movies_webapp.payloads.HistoryDTO;
 import com.karhacter.movies_webapp.service.HistoryService;
 
 @RestController
@@ -23,7 +22,7 @@ public class HistoryController {
     private HistoryService historyService;
 
     @GetMapping("/favorites/{userId}")
-    public List<HistoryDTO> getUserHistory(@PathVariable Long userId) {
+    public List<History> getUserHistory(@PathVariable Long userId) {
         return historyService.getUserHistory(userId);
     }
 

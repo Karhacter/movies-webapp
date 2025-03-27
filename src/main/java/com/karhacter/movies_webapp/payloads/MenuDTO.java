@@ -1,7 +1,12 @@
 package com.karhacter.movies_webapp.payloads;
 
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MenuDTO {
-    private long id;
+    private long menuId;
     private String name;
     private String link;
     private Integer sortOrder;

@@ -1,6 +1,7 @@
 package com.karhacter.movies_webapp.payloads;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.*;
 
@@ -10,13 +11,17 @@ import lombok.*;
 public class MovieDTO {
     private long id;
     private String title;
-    private String image;
+    private String image; // Main poster image
+    private List<String> galleryImages; // Additional images
     private String description;
+    private String slug;
     private Date releaseDate;
     private int duration;
-    private int tokens;
     private double rating;
+    private int tokens;
     private String videoUrl;
-    private Long categoryId; // Thêm categoryId
-    private String categoryName; // Thêm categoryName
+    private CategoryDTO category;
+    private List<CommentDTO> comments;
+    private List<ReviewDTO> reviews;
+    private List<HistoryDTO> history;
 }

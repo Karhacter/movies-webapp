@@ -79,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
         // check if the category exists
         Category existingCategory = categoryRepo.findById(id)
                 .orElseThrow(() -> new APIException("Category with id '" + id + "' not found !!!"));
-        
+
         // delete category
         categoryRepo.delete(existingCategory);
 

@@ -6,7 +6,7 @@ import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.payloads.CategoryDTO;
 
 public interface CategoryService {
-    // add new category
+    // add new categorys
     CategoryDTO createCategory(Category category);
 
     // get all categories

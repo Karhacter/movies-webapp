@@ -7,5 +7,5 @@ import com.karhacter.movies_webapp.entity.Menu;
 
 @Repository
 public interface MenuRepo extends JpaRepository<Menu, Integer> {
-    Menu findByName(String name);
+    Menu findByMenuName(String name);
 }

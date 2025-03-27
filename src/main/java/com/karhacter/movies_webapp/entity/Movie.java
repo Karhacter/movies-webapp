@@ -26,6 +26,8 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CollectionTable;
 
 @Entity
 @Table(name = "movies")
@@ -43,12 +45,23 @@ public class Movie {
     @Size(min = 4, message = "Movie name must contain at least 3 characters")
     private String title;
 
+    // Main poster image
     private String image;
+
+    // Additional images (gallery)
+    @ElementCollection
+    @CollectionTable(name = "movie_images", joinColumns = @JoinColumn(name = "movie_id"))
+    @Column(name = "image_url")
+    private List<String> galleryImages;
 
     @NotBlank
     @Size(min = 10, message = "Description must contain at least 10 characters")
     @Lob
     private String description;
+
+    @NotBlank
+    @Lob
+    private String slug;
 
     @Column(name = "release_date")
     @PastOrPresent
@@ -71,6 +84,10 @@ public class Movie {
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

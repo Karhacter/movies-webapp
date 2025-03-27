@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/menus")
 public class MenuController {
+
     @Autowired
     private MenuService menuService;
 
@@ -40,4 +41,6 @@ public class MenuController {
     public ResponseEntity<List<MenuDTO>> getAllMenus() {
         return new ResponseEntity<>(menuService.getAllMenu(), HttpStatus.OK);
     }
+
+    
 }
