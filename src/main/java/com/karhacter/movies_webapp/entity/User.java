@@ -1,8 +1,8 @@
 package com.karhacter.movies_webapp.entity;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +33,6 @@ import jakarta.validation.constraints.Size;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Data
 public class User implements UserDetails {
     @Id
@@ -47,7 +45,7 @@ public class User implements UserDetails {
 
     @Size(min = 10, max = 10, message = "Moblie Number must be exactly 10 digits long")
     @Pattern(regexp = "^\\d{10}$", message = "Moblie Number must contain only numbers")
-    private String moblieNumber;
+    private String mobileNumber;
 
     @Email
     @NotBlank
@@ -57,7 +55,7 @@ public class User implements UserDetails {
     private String avatar;
 
     @NotBlank
-    @Size(min = 8)
+    @Size(min = 5)
     private String password;
 
     private int balance;

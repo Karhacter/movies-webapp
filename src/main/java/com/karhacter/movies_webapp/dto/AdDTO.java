@@ -1,8 +1,10 @@
-package com.karhacter.movies_webapp.payloads;
+package com.karhacter.movies_webapp.dto;
 
 import java.util.Date;
-import com.karhacter.movies_webapp.entity.AdType;
+
 import com.karhacter.movies_webapp.entity.AdStatus;
+import com.karhacter.movies_webapp.entity.AdType;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

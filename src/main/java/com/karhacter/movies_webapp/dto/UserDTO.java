@@ -1,4 +1,4 @@
-package com.karhacter.movies_webapp.payloads;
+package com.karhacter.movies_webapp.dto;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import lombok.*;
 public class UserDTO {
     private long userID;
     private String name;
-    private String moblieNumber;
+    private String mobileNumber;
     private String email;
     private String avatar;
     private String password;

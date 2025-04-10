@@ -1,4 +1,4 @@
-package com.karhacter.movies_webapp.payloads;
+package com.karhacter.movies_webapp.dto;
 
 import lombok.*;
 
@@ -7,11 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 public class EpisodeDTO {
     private Long id;
-    private String title;
     private int season;
     private int episodeNumber;
     private int prriceInTokens;
     private int duration;
-    private String downloadUrl;
-
+    private String videoUrl;
 }

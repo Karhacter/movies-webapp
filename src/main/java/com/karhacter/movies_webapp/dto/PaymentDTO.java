@@ -1,8 +1,10 @@
-package com.karhacter.movies_webapp.payloads;
+package com.karhacter.movies_webapp.dto;
 
 import java.util.Date;
-import com.karhacter.movies_webapp.entity.PaymentStatus;
+
 import com.karhacter.movies_webapp.entity.PaymentMethod;
+import com.karhacter.movies_webapp.entity.PaymentStatus;
+
 import lombok.*;
 
 @Data

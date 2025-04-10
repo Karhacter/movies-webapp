@@ -1,4 +1,4 @@
-package com.karhacter.movies_webapp.payloads;
+package com.karhacter.movies_webapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
