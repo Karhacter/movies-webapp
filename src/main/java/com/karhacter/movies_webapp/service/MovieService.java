@@ -3,19 +3,23 @@ package com.karhacter.movies_webapp.service;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.karhacter.movies_webapp.dto.MovieDTO;
+import com.karhacter.movies_webapp.dto.MovieStatsDTO;
 import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.entity.Movie;
-import com.karhacter.movies_webapp.payloads.MovieDTO;
-import com.karhacter.movies_webapp.payloads.MovieStatsDTO;
 
 public interface MovieService {
 
     // add new movie
-    MovieDTO createMovie(Long categoryId, Movie movie);
+    MovieDTO createMovie(Movie movie, MultipartFile imageFile);
 
     // optional 2: use MovieResponse
 
     Page<MovieDTO> getAllMovies(Pageable pageable);
+
+    List<MovieDTO> getMovieList();
 
     // get one movie
     MovieDTO getMovieById(Long id);
@@ -24,13 +28,18 @@ public interface MovieService {
     MovieDTO getMovieBySlug(String slug);
 
     // update movie
-    MovieDTO updateMovie(Long id, Movie movie);
+    MovieDTO updateMovie(Long id, Movie movie, MultipartFile imageFile);
 
     // delete movie
     String deleteMovie(Long id);
 
+    String softDelete(Long id);
+
+    // restore movie
+    String restoreMovie(Long id);
+
     // get all movies by category
-    List<MovieDTO> getMovieByCategory(Category cateID, Movie movie);
+    Page<MovieDTO> getMovieByCategory(Category cateID, Movie movie, Pageable pageable);
 
     // Add images to movie gallery
     MovieDTO addGalleryImages(Long movieId, List<String> imageUrls);
@@ -40,7 +49,7 @@ public interface MovieService {
 
     // Update main poster image
     MovieDTO updateMainImage(Long movieId, String newImageUrl);
-    
+
     // Get overall movie statistics
     MovieStatsDTO getMovieStatistics();
 
@@ -66,5 +75,5 @@ public interface MovieService {
     List<MovieDTO> getMoviesByDurationRange(int minDuration, int maxDuration);
 
     // Search movies by keyword
-    
+
 }

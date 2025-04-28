@@ -1,7 +1,8 @@
 package com.karhacter.movies_webapp.service;
 
 import java.util.List;
-import com.karhacter.movies_webapp.payloads.CommentDTO;
+
+import com.karhacter.movies_webapp.dto.CommentDTO;
 
 public interface CommentService {
     // Create a new comment on a movie
@@ -12,6 +13,9 @@ public interface CommentService {
 
     // Get all comments by a specific user
     List<CommentDTO> getCommentsByUserId(Long userId);
+
+    // Get all comments for a specific movie by title
+    List<CommentDTO> getCommentsByMovieTitle(String movieTitle);
 
     // Update an existing comment
     CommentDTO updateComment(Long commentId, CommentDTO commentDTO);
@@ -24,4 +28,11 @@ public interface CommentService {
 
     // Report a comment as inappropriate
     void reportComment(Long commentId, String reason);
+
+    String softDelete(Long commentId);
+
+    String restore(Long commentId);
+
+    // Count comments by movieId
+    long countCommentsByMovieId(Long movieId);
 }

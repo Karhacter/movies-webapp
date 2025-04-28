@@ -6,14 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.karhacter.movies_webapp.payloads.CommentDTO;
+import com.karhacter.movies_webapp.dto.CommentDTO;
 import com.karhacter.movies_webapp.service.CommentService;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/comments")
-@CrossOrigin(origins = "*")
 public class CommentController {
 
     @Autowired
@@ -34,6 +33,12 @@ public class CommentController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<CommentDTO>> getCommentsByUser(@PathVariable Long userId) {
         List<CommentDTO> comments = commentService.getCommentsByUserId(userId);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<CommentDTO>> getCommentsByMovieTitle(@RequestParam String movieTitle) {
+        List<CommentDTO> comments = commentService.getCommentsByMovieTitle(movieTitle);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
@@ -64,5 +69,25 @@ public class CommentController {
             @RequestParam String reason) {
         commentService.reportComment(commentId, reason);
         return new ResponseEntity<>("Comment reported successfully", HttpStatus.OK);
+    }
+
+    // restore comment
+    @PostMapping("/restore/{id}")
+    public ResponseEntity<String> restoreComment(@PathVariable Long id) {
+        String message = commentService.restore(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    // soft delete
+    @PostMapping("/soft-delete/{id}")
+    public ResponseEntity<String> softDelete(@PathVariable Long id) {
+        String message = commentService.softDelete(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @GetMapping("/count/movie/{movieId}")
+    public ResponseEntity<Long> countCommentsByMovieId(@PathVariable Long movieId) {
+        long count = commentService.countCommentsByMovieId(movieId);
+        return new ResponseEntity<>(count, HttpStatus.OK);
     }
 }

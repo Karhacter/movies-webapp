@@ -10,12 +10,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.karhacter.movies_webapp.dto.CommentDTO;
 import com.karhacter.movies_webapp.entity.Comment;
 import com.karhacter.movies_webapp.entity.Movie;
 import com.karhacter.movies_webapp.entity.User;
 import com.karhacter.movies_webapp.exception.APIException;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
-import com.karhacter.movies_webapp.payloads.CommentDTO;
 import com.karhacter.movies_webapp.repository.CommentRepo;
 import com.karhacter.movies_webapp.repository.MovieRepo;
 import com.karhacter.movies_webapp.repository.UserRepo;
@@ -49,6 +49,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = modelMapper.map(commentDTO, Comment.class);
         comment.setUser(user);
         comment.setMovie(movie);
+        comment.setStatusDelete(1);
         comment = commentRepo.save(comment);
 
         return modelMapper.map(comment, CommentDTO.class);
@@ -73,6 +74,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<CommentDTO> getCommentsByMovieTitle(String movieTitle) {
+        Movie movie = movieRepo.findByTitle(movieTitle);
+        if (movie == null) {
+            throw new ResourceNotFoundException("Movie", "title", movieTitle);
+        }
+        List<Comment> comments = commentRepo.findByMovie(movie);
+        return comments.stream()
+                .map(comment -> modelMapper.map(comment, CommentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public CommentDTO updateComment(Long commentId, CommentDTO commentDTO) {
         // Get existing comment
@@ -80,6 +93,10 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
 
         // Verify user owns this comment
+        // Added null check for userId in commentDTO to prevent NullPointerException
+        if (commentDTO.getUserId() == null) {
+            throw new APIException("User ID in commentDTO cannot be null");
+        }
         if (comment.getUser().getUserID() != commentDTO.getUserId()) {
             throw new APIException("You can only update your own comments!");
         }
@@ -113,10 +130,29 @@ public class CommentServiceImpl implements CommentService {
     public void reportComment(Long commentId, String reason) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
-
-        // Here you could implement additional logic for handling reported comments
-        // For example, setting a flag, sending notifications to moderators, etc.
-        // For now, we'll just log the report
         System.out.println("Comment " + commentId + " reported for reason: " + reason);
+    }
+
+    @Override
+    public String softDelete(Long commentId) {
+        Comment comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", "commentId", commentId));
+        comment.setStatusDelete(1);
+        commentRepo.save(comment);
+        return "Comment soft-deleted successfully";
+    }
+
+    @Override
+    public String restore(Long commentId) {
+        Comment comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", "commentId", commentId));
+        comment.setStatusDelete(0);
+        commentRepo.save(comment);
+        return "Comment restored successfully";
+    }
+
+    @Override
+    public long countCommentsByMovieId(Long movieId) {
+        return commentRepo.countByMovieId(movieId);
     }
 }
