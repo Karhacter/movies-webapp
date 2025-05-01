@@ -64,6 +64,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<CommentDTO> getCommentsByMovieSlug(String slug) {
+        List<Comment> comments = commentRepo.findByMovieSlug(slug);
+        return comments.stream()
+                .map(comment -> modelMapper.map(comment, CommentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<CommentDTO> getCommentsByUserId(Long userId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));

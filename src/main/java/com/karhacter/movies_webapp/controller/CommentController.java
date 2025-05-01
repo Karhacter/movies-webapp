@@ -30,6 +30,12 @@ public class CommentController {
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
+    @GetMapping("/movie/slug/{slug}")
+    public ResponseEntity<List<CommentDTO>> getCommentsByMovie(@PathVariable String slug) {
+        List<CommentDTO> comments = commentService.getCommentsByMovieSlug(slug);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<CommentDTO>> getCommentsByUser(@PathVariable Long userId) {
         List<CommentDTO> comments = commentService.getCommentsByUserId(userId);

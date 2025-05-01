@@ -53,15 +53,69 @@ public class MovieServiceImpl implements MovieService {
         }
 
         @Override
+        public List<MovieDTO> getSeasonsByParentId(Long parentId) {
+                Movie parentMovie = movieRepo.findById(parentId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", parentId));
+                List<Movie> seasons = movieRepo.findByParentID(parentMovie);
+                // Sort by seasonNumber ascending
+                seasons.sort((m1, m2) -> {
+                        Integer s1 = m1.getSeasonNumber() != null ? m1.getSeasonNumber() : 0;
+                        Integer s2 = m2.getSeasonNumber() != null ? m2.getSeasonNumber() : 0;
+                        return s1.compareTo(s2);
+                });
+                return seasons.stream()
+                                .map(movie -> modelMapper.map(movie, MovieDTO.class))
+                                .collect(Collectors.toList());
+        }
+
+        private String convertTitleToSlug(String title) {
+                if (title == null) {
+                        return "";
+                }
+                // Convert to lowercase
+                String slug = title.toLowerCase();
+                // Replace spaces and special characters with hyphens
+                slug = slug.replaceAll("[\\s\\p{Punct}]+", "-");
+                // Remove non-alphanumeric characters except hyphens
+                slug = slug.replaceAll("[^a-z0-9-]", "");
+                // Trim leading and trailing hyphens
+                slug = slug.replaceAll("^-+|-+$", "");
+                return slug;
+        }
+
+        @SuppressWarnings("unlikely-arg-type")
+        @Override
         public MovieDTO createMovie(Movie movie, MultipartFile imageFile) {
-                Long categoryId = movie.getCategory().getId();
-                Category category = categoryRepo.findById(categoryId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
-                movie.setCategory(category);
+                List<Category> categories = movie.getCategories();
+                if (categories != null && !categories.isEmpty()) {
+                        List<Category> managedCategories = categories.stream()
+                                        .map(cat -> categoryRepo.findById(cat.getId())
+                                                        .orElseThrow(() -> new ResourceNotFoundException("Category",
+                                                                        "id", Long.valueOf(cat.getId()))))
+                                        .collect(Collectors.toList());
+                        movie.setCategories(managedCategories);
+                } else {
+                        throw new ResourceNotFoundException("Category", "id", "null");
+                }
+
+                // Set slug from title
+                movie.setSlug(convertTitleToSlug(movie.getTitle()));
 
                 if (imageFile != null && !imageFile.isEmpty()) {
                         String imageUrl = uploadImage(imageFile);
                         movie.setImage(imageUrl);
+                }
+
+                // Assign seasonNumber based on parentID and if parentID equals movie's own ID
+                if (movie.getParentID() == null || movie.getParentID().equals(movie.getId())) {
+                        movie.setSeasonNumber(1);
+                } else {
+                        List<Movie> siblings = movieRepo.findByParentID(movie.getParentID());
+                        int maxSeason = siblings.stream()
+                                        .mapToInt(m -> m.getSeasonNumber() != null ? m.getSeasonNumber() : 0)
+                                        .max()
+                                        .orElse(0);
+                        movie.setSeasonNumber(maxSeason + 1);
                 }
 
                 Movie savedMovie = movieRepo.save(movie);
@@ -135,7 +189,33 @@ public class MovieServiceImpl implements MovieService {
                 existingMovie.setRating(movie.getRating());
                 existingMovie.setTokens(movie.getTokens());
                 existingMovie.setVideoUrl(movie.getVideoUrl());
-                existingMovie.setCategory(movie.getCategory());
+
+                // Assign seasonNumber based on parentID
+                if (movie.getParentID() == null) {
+                        existingMovie.setSeasonNumber(1);
+                } else {
+                        List<Movie> siblings = movieRepo.findByParentID(movie.getParentID());
+                        int maxSeason = siblings.stream()
+                                        .mapToInt(m -> m.getSeasonNumber() != null ? m.getSeasonNumber() : 0)
+                                        .max()
+                                        .orElse(0);
+                        existingMovie.setSeasonNumber(maxSeason + 1);
+                }
+
+                List<Category> categories = movie.getCategories();
+                if (categories != null && !categories.isEmpty()) {
+                        List<Category> managedCategories = categories.stream()
+                                        .map(cat -> categoryRepo.findById(cat.getId())
+                                                        .orElseThrow(() -> new ResourceNotFoundException("Category",
+                                                                        "id", Long.valueOf(cat.getId()))))
+                                        .collect(Collectors.toList());
+                        existingMovie.setCategories(managedCategories);
+                } else {
+                        throw new ResourceNotFoundException("Category", "id", "null");
+                }
+
+                // Update slug from title
+                existingMovie.setSlug(convertTitleToSlug(movie.getTitle()));
 
                 if (imageFile != null && !imageFile.isEmpty()) {
                         String imageUrl = uploadImage(imageFile);

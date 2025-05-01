@@ -1,7 +1,15 @@
 package com.karhacter.movies_webapp.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +36,7 @@ import org.springframework.http.MediaType;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
 
     // add a new user with avatar upload
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -36,7 +46,7 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO;
         try {
-            String userJson = new String(userDTOFile.getBytes());
+            String userJson = new String(userDTOFile.getBytes(), java.nio.charset.StandardCharsets.UTF_8);
             userDTO = objectMapper.readValue(userJson, UserDTO.class);
             userDTO.convertRoleIdToRoleIds();
         } catch (Exception e) {
@@ -55,6 +65,32 @@ public class UserController {
     @GetMapping("/index")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<UserDTO>> getPageUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "rating") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
+
+        logger.info("Received request for movies - Page: {}, Size: {}, SortBy: {}, SortOrder: {}",
+                page, size, sortBy, sortOrder);
+
+        // Ensure page is not negative
+        page = Math.max(0, page);
+
+        Sort sort = sortOrder.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<UserDTO> users = userService.getPageUser(pageable);
+
+        logger.info("Returning movies - Current Page: {}, Total Pages: {}, Total Elements: {}",
+                users.getNumber(), users.getTotalPages(), users.getTotalElements());
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/detail/id/{userId}")
@@ -87,13 +123,13 @@ public class UserController {
 
     // update user with avatar upload
     @PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long userId,
+    public ResponseEntity<?> updateUser(@PathVariable Long userId,
             @RequestPart(value = "userDTO", required = true) MultipartFile userDTOFile,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO;
         try {
-            String userJson = new String(userDTOFile.getBytes());
+            String userJson = new String(userDTOFile.getBytes(), java.nio.charset.StandardCharsets.UTF_8);
             userDTO = objectMapper.readValue(userJson, UserDTO.class);
             userDTO.convertRoleIdToRoleIds();
         } catch (Exception e) {
@@ -103,9 +139,12 @@ public class UserController {
         try {
             UserDTO updatedUser = userService.updateUser(userId, userDTO, imageFile);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (com.karhacter.movies_webapp.exception.APIException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
+
 }

@@ -11,7 +11,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +50,8 @@ public class UserServiceImpl implements UserService {
 
     private final RoleRepo roleRepo;
 
+    private static final Logger logger = LoggerFactory.getLogger(MovieServiceImpl.class);
+
     public UserServiceImpl(UserRepo userRepo, ModelMapper modelMapper, RoleRepo roleRepo,
             PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepo = userRepo;
@@ -52,6 +59,13 @@ public class UserServiceImpl implements UserService {
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    "Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
@@ -148,6 +162,12 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
+        // Check if email exists for a different user
+        Optional<User> userWithEmail = userRepo.findByEmail(userDTO.getEmail());
+        if (userWithEmail.isPresent() && userWithEmail.get().getUserID() != userId) {
+            throw new APIException("Email already exists: " + userDTO.getEmail());
+        }
+
         existingUser.setName(userDTO.getName());
         existingUser.setMobileNumber(userDTO.getMobileNumber());
         existingUser.setEmail(userDTO.getEmail());
@@ -210,6 +230,27 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Wrong password");
         }
         return jwtUtil.generateToken(user);
+    }
+
+    @Override
+    public Page<UserDTO> getPageUser(Pageable pageable) {
+        logger.info("Service: Getting movies for page: {}, size: {}", pageable.getPageNumber(),
+                pageable.getPageSize());
+        // No pageable findAllActive method, so fallback to filtering after fetching all
+        // active movies
+        List<User> activeUsers = userRepo.findAll();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), activeUsers.size());
+        List<User> pageContent = activeUsers.subList(start, end);
+        Page<UserDTO> userDTOs = new PageImpl<>(
+                pageContent.stream()
+                        .map(movie -> modelMapper.map(movie, UserDTO.class))
+                        .collect(Collectors.toList()),
+                pageable,
+                activeUsers.size());
+        logger.info("Service: Returning {} movies for page: {}", userDTOs.getContent().size(),
+                userDTOs.getNumber());
+        return userDTOs;
     }
 
 }

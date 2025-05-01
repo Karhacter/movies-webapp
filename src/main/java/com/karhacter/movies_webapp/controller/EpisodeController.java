@@ -5,15 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.karhacter.movies_webapp.dto.EpisodeDTO;
 import com.karhacter.movies_webapp.entity.Episode;
-
-import com.karhacter.movies_webapp.payloads.EpisodeDTO;
 import com.karhacter.movies_webapp.service.EpisodeService;
 
 import jakarta.validation.Valid;
@@ -24,10 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
 @RequestMapping("/api/episodes")
 @RestController
-@CrossOrigin(origins = "*")
 public class EpisodeController {
     @Autowired
     private EpisodeService episodeService;
@@ -46,11 +41,17 @@ public class EpisodeController {
         return new ResponseEntity<>(savedEpDTO, HttpStatus.OK);
     }
 
-    // get one cate
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<EpisodeDTO> getByEpId(@PathVariable Long id) {
-        EpisodeDTO detailEpDTO = episodeService.getById(id);
-        return new ResponseEntity<>(detailEpDTO, HttpStatus.OK);
+    // get episode of that movie from id
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<List<EpisodeDTO>> getEpisodesByMovieId(@PathVariable Long movieId) {
+        List<EpisodeDTO> episodes = episodeService.getEpisodesByMovieId(movieId);
+        return new ResponseEntity<>(episodes, HttpStatus.OK);
+    }
+
+    @GetMapping("/movie/slug/{slug}")
+    public ResponseEntity<List<EpisodeDTO>> getEpisodesByMovieId(@PathVariable String slug) {
+        List<EpisodeDTO> episodes = episodeService.getEpisodesByMovieSlug(slug);
+        return new ResponseEntity<>(episodes, HttpStatus.OK);
     }
 
     // update category

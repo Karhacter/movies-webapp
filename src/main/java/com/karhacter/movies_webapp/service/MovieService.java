@@ -76,4 +76,7 @@ public interface MovieService {
 
     // Search movies by keyword
 
+    // Get seasons by parent movie ID
+    List<MovieDTO> getSeasonsByParentId(Long parentId);
+
 }

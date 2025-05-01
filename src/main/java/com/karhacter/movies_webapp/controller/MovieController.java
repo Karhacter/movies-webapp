@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -26,6 +25,7 @@ import com.karhacter.movies_webapp.service.MovieService;
 
 @RestController
 @RequestMapping("/api/")
+@CrossOrigin
 public class MovieController {
         private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
 
@@ -48,7 +48,7 @@ public class MovieController {
                 Movie movie;
                 try {
                         movie = objectMapper.readValue(movieJson, Movie.class);
-                } catch (JsonProcessingException e) {
+                } catch (Exception e) {
                         return ResponseEntity.badRequest().build();
                 }
                 MovieDTO savedMovieDTO = movieService.createMovie(movie, imageFile);
@@ -164,5 +164,11 @@ public class MovieController {
                                 decodedLink, movies.getNumber(), movies.getTotalPages(), movies.getTotalElements());
 
                 return new ResponseEntity<>(movies, HttpStatus.OK);
+        }
+
+        @GetMapping("movies/{parentId}/seasons")
+        public ResponseEntity<List<MovieDTO>> getSeasonsByParentId(@PathVariable Long parentId) {
+                List<MovieDTO> seasons = movieService.getSeasonsByParentId(parentId);
+                return new ResponseEntity<>(seasons, HttpStatus.OK);
         }
 }

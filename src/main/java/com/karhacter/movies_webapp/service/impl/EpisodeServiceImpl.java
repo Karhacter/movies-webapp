@@ -2,15 +2,18 @@ package com.karhacter.movies_webapp.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.karhacter.movies_webapp.dto.EpisodeDTO;
 import com.karhacter.movies_webapp.entity.Episode;
+import com.karhacter.movies_webapp.entity.Movie;
 import com.karhacter.movies_webapp.exception.APIException;
-import com.karhacter.movies_webapp.payloads.EpisodeDTO;
 import com.karhacter.movies_webapp.repository.EpsiodeRepo;
+import com.karhacter.movies_webapp.repository.MovieRepo;
 import com.karhacter.movies_webapp.service.EpisodeService;
 
 import jakarta.transaction.Transactional;
@@ -23,6 +26,9 @@ public class EpisodeServiceImpl implements EpisodeService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private MovieRepo movieRepo;
 
     @Override
     public EpisodeDTO createEp(Episode episode) {
@@ -52,12 +58,34 @@ public class EpisodeServiceImpl implements EpisodeService {
     }
 
     @Override
-    public EpisodeDTO getById(Long id) {
-        Optional<Episode> existedEpisode = episodeRepo.findById(id);
-        if (existedEpisode.isEmpty()) {
-            throw new APIException("Episode with id '" + id + "' not found !!!");
-        }
-        return modelMapper.map(existedEpisode.get(), EpisodeDTO.class);
+    public List<EpisodeDTO> getEpisodesByMovieId(Long movieId) {
+        // Fetch the movie by its ID
+        Movie movie = movieRepo.findById(movieId)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        // Fetch episodes by movie
+        List<Episode> episodes = episodeRepo.findByMovie(movie);
+
+        // Convert entities to DTOs using ModelMapper
+        return episodes.stream()
+                .map(episode -> modelMapper.map(episode, EpisodeDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    //
+    @Override
+    public List<EpisodeDTO> getEpisodesByMovieSlug(String slug) {
+        // Fetch the movie by its ID
+        Movie movie = movieRepo.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        // Fetch episodes by movie
+        List<Episode> episodes = episodeRepo.findByMovie(movie);
+
+        // Convert entities to DTOs using ModelMapper
+        return episodes.stream()
+                .map(episode -> modelMapper.map(episode, EpisodeDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -69,4 +97,5 @@ public class EpisodeServiceImpl implements EpisodeService {
         episodeRepo.delete(existedEpisode.get());
         return "Episode with id '" + id + "' deleted successfully !!!";
     }
+
 }
