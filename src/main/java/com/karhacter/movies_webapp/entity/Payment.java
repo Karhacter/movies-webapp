@@ -37,6 +37,8 @@ public class Payment {
 
     private String transactionId;
 
+    private String idempotencyToken;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date paymentDate;
 

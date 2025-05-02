@@ -10,6 +10,7 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import io.micrometer.common.lang.Nullable;
 import lombok.*;
 
 import jakarta.persistence.CascadeType;
@@ -39,8 +40,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userID;
 
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 20 characters")
-    @Pattern(regexp = "[a-zA-Z]*$", message = "First Name must not contain numbers or special characters")
+    private int statusDelete = 1;
+
+    private boolean isPremium = false;
+
+    private java.time.LocalDateTime membershipExpiration;
+
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 20 characters")
     private String name;
 
     @Size(min = 10, max = 10, message = "Moblie Number must be exactly 10 digits long")
@@ -52,6 +58,7 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Nullable
     private String avatar;
 
     @NotBlank

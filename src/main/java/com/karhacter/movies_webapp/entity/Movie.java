@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +13,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -22,8 +25,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import jakarta.persistence.ElementCollection;
@@ -33,12 +35,10 @@ import jakarta.persistence.CollectionTable;
 @Table(name = "movies")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Data
-@Setter
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotBlank
@@ -59,12 +59,10 @@ public class Movie {
     @Lob
     private String description;
 
-    @NotBlank
     @Lob
     private String slug;
 
     @Column(name = "release_date")
-    @PastOrPresent
     @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;
 
@@ -75,15 +73,15 @@ public class Movie {
     @DecimalMax("10.0")
     private double rating;
 
-    @Positive
+    @PositiveOrZero
     private int tokens;
 
     @NotBlank
     private String videoUrl;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @ManyToMany
+    @JoinTable(name = "movie_categories", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<Category> categories;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -96,4 +94,16 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<History> history;
+
+    @Column(name = "status_delete")
+    private Integer statusDelete = 1;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_movieID", nullable = true)
+    private Movie parentID;
+
+    @Column(name = "season_number")
+    @Nullable
+    private Integer seasonNumber;
+
 }

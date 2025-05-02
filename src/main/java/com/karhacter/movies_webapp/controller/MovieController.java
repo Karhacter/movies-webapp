@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.karhacter.movies_webapp.dto.MovieDTO;
+import com.karhacter.movies_webapp.dto.MovieMapper;
 import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
 import com.karhacter.movies_webapp.repository.CategoryRepo;
@@ -45,21 +46,43 @@ public class MovieController {
                         @RequestPart("movie") String movieJson,
                         @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                Movie movie;
+                MovieDTO movieDTO;
                 try {
-                        movie = objectMapper.readValue(movieJson, Movie.class);
+                        movieDTO = objectMapper.readValue(movieJson, MovieDTO.class);
                 } catch (Exception e) {
                         return ResponseEntity.badRequest().build();
                 }
+                Movie movie = MovieMapper.convertToEntity(movieDTO);
                 MovieDTO savedMovieDTO = movieService.createMovie(movie, imageFile);
                 return new ResponseEntity<>(savedMovieDTO, HttpStatus.CREATED);
         }
 
         // get all movies list in admin mode
 
-        @GetMapping("movies/get-all")
-        public ResponseEntity<List<MovieDTO>> getAllMovies() {
-                return new ResponseEntity<>(movieService.getMovieList(), HttpStatus.OK);
+        @GetMapping("movies/trash")
+        public ResponseEntity<Page<MovieDTO>> getTrashMovie(
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        @RequestParam(defaultValue = "rating") String sortBy,
+                        @RequestParam(defaultValue = "desc") String sortOrder) {
+
+                logger.info("Received request for movies - Page: {}, Size: {}, SortBy: {}, SortOrder: {}",
+                                page, size, sortBy, sortOrder);
+
+                // Ensure page is not negative
+                page = Math.max(0, page);
+
+                Sort sort = sortOrder.equalsIgnoreCase("desc")
+                                ? Sort.by(sortBy).descending()
+                                : Sort.by(sortBy).ascending();
+
+                Pageable pageable = PageRequest.of(page, size, sort);
+                Page<MovieDTO> movies = movieService.getTrashMovie(pageable);
+
+                logger.info("Returning movies - Current Page: {}, Total Pages: {}, Total Elements: {}",
+                                movies.getNumber(), movies.getTotalPages(), movies.getTotalElements());
+
+                return new ResponseEntity<>(movies, HttpStatus.OK);
         }
 
         // get all movies
@@ -103,12 +126,13 @@ public class MovieController {
                         @RequestPart("movie") String movieJson,
                         @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                Movie movie;
+                MovieDTO movieDTO;
                 try {
-                        movie = objectMapper.readValue(movieJson, Movie.class);
+                        movieDTO = objectMapper.readValue(movieJson, MovieDTO.class);
                 } catch (Exception e) {
                         return ResponseEntity.badRequest().build();
                 }
+                Movie movie = MovieMapper.convertToEntity(movieDTO);
                 MovieDTO updatedMovieDTO = movieService.updateMovie(id, movie, imageFile);
                 return new ResponseEntity<>(updatedMovieDTO, HttpStatus.OK);
         }
