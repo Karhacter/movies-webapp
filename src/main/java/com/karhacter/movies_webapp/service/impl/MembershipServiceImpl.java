@@ -58,7 +58,8 @@ public class MembershipServiceImpl implements MembershipService {
                                 // Return existing response if payment with idempotencyToken exists
                                 User user = existingPayment.getUser();
                                 MembershipPackage membershipPackage = membershipPackageRepository.findById(packageId)
-                                                .orElseThrow(() -> new RuntimeException("Membership package not found"));
+                                                .orElseThrow(() -> new RuntimeException(
+                                                                "Membership package not found"));
                                 return new MembershipPurchaseResponseDTO(
                                                 true,
                                                 "Membership purchase already processed",
@@ -71,6 +72,11 @@ public class MembershipServiceImpl implements MembershipService {
                 }
 
                 User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+                if (user.isPremium()) {
+                        throw new RuntimeException("User is already a premium member and cannot purchase again.");
+                }
+
                 MembershipPackage membershipPackage = membershipPackageRepository.findById(packageId)
                                 .orElseThrow(() -> new RuntimeException("Membership package not found"));
 

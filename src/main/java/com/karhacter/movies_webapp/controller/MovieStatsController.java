@@ -6,13 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.karhacter.movies_webapp.payloads.MovieDTO;
-import com.karhacter.movies_webapp.payloads.MovieStatsDTO;
+import com.karhacter.movies_webapp.dto.MovieDTO;
+import com.karhacter.movies_webapp.dto.MovieStatsDTO;
 import com.karhacter.movies_webapp.service.MovieService;
 
 @RestController
 @RequestMapping("/api/movies/stats")
-@CrossOrigin(origins = "*")
 public class MovieStatsController {
 
     @Autowired

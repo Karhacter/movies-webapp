@@ -2,6 +2,8 @@ package com.karhacter.movies_webapp.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.karhacter.movies_webapp.dto.UserDTO;
@@ -10,7 +12,9 @@ import com.karhacter.movies_webapp.payloads.LoginResponse;
 public interface UserService {
     UserDTO registerUser(UserDTO userDTO, MultipartFile imageFile);
 
-    UserDTO getUserByEmail(String email); // Đã thêm phương thức này
+    UserDTO getUserByEmail(String email);
+
+    Page<UserDTO> getPageUser(Pageable pageable);
 
     List<UserDTO> getAllUsers();
 

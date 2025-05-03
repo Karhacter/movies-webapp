@@ -1,5 +1,6 @@
 package com.karhacter.movies_webapp.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,5 +49,47 @@ public class MovieMapper {
         }
 
         return movie;
+    }
+
+    public static MovieDTO convertToDTO(Movie movie) {
+        MovieDTO dto = new MovieDTO();
+        dto.setId(movie.getId());
+        dto.setTitle(movie.getTitle());
+        dto.setImage(movie.getImage());
+        dto.setGalleryImages(new ArrayList<>(movie.getGalleryImages()));
+        dto.setDescription(movie.getDescription());
+        dto.setSlug(movie.getSlug());
+        dto.setDuration(movie.getDuration());
+        dto.setRating(movie.getRating());
+        dto.setTokens(movie.getTokens());
+        dto.setVideoUrl(movie.getVideoUrl());
+        dto.setStatusDelete(movie.getStatusDelete());
+        dto.setParentID(movie.getParentID() != null ? movie.getParentID().getId() : null);
+        dto.setSeasonNumber(movie.getSeasonNumber());
+
+        // Handle release date conversion
+        if (movie.getReleaseDate() != null) {
+            dto.setReleaseDate(new java.sql.Date(movie.getReleaseDate().getTime()));
+        }
+
+        // Convert Categories properly
+        if (movie.getCategories() != null) {
+            dto.setCategories(movie.getCategories().stream()
+                    .map(cat -> {
+                        CategoryDTO categoryDTO = new CategoryDTO();
+                        categoryDTO.setId(cat.getId());
+                        categoryDTO.setName(cat.getName());
+                        categoryDTO.setLink(cat.getLink()); // Add this if needed
+                        return categoryDTO;
+                    })
+                    .collect(Collectors.toList()));
+        }
+
+        // Handle lazy-loaded collections
+        dto.setComments(null);
+        dto.setReviews(null);
+        dto.setHistory(null);
+
+        return dto;
     }
 }

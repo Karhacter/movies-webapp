@@ -1,6 +1,7 @@
 package com.karhacter.movies_webapp.service.impl;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.karhacter.movies_webapp.dto.MovieDTO;
+import com.karhacter.movies_webapp.dto.MovieMapper;
 import com.karhacter.movies_webapp.dto.MovieStatsDTO;
 import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.entity.Movie;
@@ -54,18 +56,25 @@ public class MovieServiceImpl implements MovieService {
 
         @Override
         public List<MovieDTO> getSeasonsByParentId(Long parentId) {
-                Movie parentMovie = movieRepo.findById(parentId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", parentId));
-                List<Movie> seasons = movieRepo.findByParentID(parentMovie);
-                // Sort by seasonNumber ascending
-                seasons.sort((m1, m2) -> {
-                        Integer s1 = m1.getSeasonNumber() != null ? m1.getSeasonNumber() : 0;
-                        Integer s2 = m2.getSeasonNumber() != null ? m2.getSeasonNumber() : 0;
-                        return s1.compareTo(s2);
-                });
-                return seasons.stream()
-                                .map(movie -> modelMapper.map(movie, MovieDTO.class))
+                // // 1. Validate parent exists
+                // if (!movieRepo.existsById(parentId)) {
+                // throw new ResourceNotFoundException("Movie", "id", parentId);
+                // }
+
+                // // 2. Find and sort seasons
+                // return movieRepo.findByParentID_Id(parentId).stream()
+                // .sorted(Comparator.comparing(
+                // movie -> movie.getSeasonNumber() != null ? movie.getSeasonNumber() : 0))
+                // .map(MovieMapper::convertToDTO)
+                // .collect(Collectors.toList());
+
+                if (!movieRepo.existsById(parentId)) {
+                        throw new ResourceNotFoundException("Movie", "id", parentId);
+                }
+                return movieRepo.findSeasonsByParentId(parentId).stream()
+                                .map(MovieMapper::convertToDTO)
                                 .collect(Collectors.toList());
+
         }
 
         private String convertTitleToSlug(String title) {
@@ -83,7 +92,6 @@ public class MovieServiceImpl implements MovieService {
                 return slug;
         }
 
-        @SuppressWarnings("unlikely-arg-type")
         @Override
         public MovieDTO createMovie(Movie movie, MultipartFile imageFile) {
                 List<Category> categories = movie.getCategories();
@@ -135,33 +143,57 @@ public class MovieServiceImpl implements MovieService {
         }
 
         @Override
-        public List<MovieDTO> getMovieList() {
-                List<Movie> movies = movieRepo.findAll(); // Fetch only active (not soft deleted) movies from DB
-                return movies.stream()
-                                .map(movie -> modelMapper.map(movie, MovieDTO.class))
-                                .collect(Collectors.toList());
+        public Page<MovieDTO> getTrashMovie(Pageable pageable) {
+                logger.info("Fetching deleted movies for page {}", pageable.getPageNumber());
+
+                // Option 1: Proper JPA pagination (recommended)
+                Page<Movie> moviePage = movieRepo.findByStatusDelete(0, pageable); // Assuming repository supports this
+
+                // Convert using MovieMapper
+                return moviePage.map(MovieMapper::convertToDTO);
+
+                /*
+                 * // Option 2: If you must use in-memory filtering (not recommended for large
+                 * datasets)
+                 * List<Movie> deletedMovies = movieRepo.findByStatusDelete(0);
+                 * 
+                 * // Manual pagination logic
+                 * int start = (int) pageable.getOffset();
+                 * int end = Math.min(start + pageable.getPageSize(), deletedMovies.size());
+                 * 
+                 * if (start > end) {
+                 * return new PageImpl<>(Collections.emptyList(), pageable,
+                 * deletedMovies.size());
+                 * }
+                 * 
+                 * List<MovieDTO> dtos = deletedMovies.subList(start, end).stream()
+                 * .map(MovieMapper::convertToDTO)
+                 * .collect(Collectors.toList());
+                 * 
+                 * return new PageImpl<>(dtos, pageable, deletedMovies.size());
+                 */
         }
 
         @Override
         public Page<MovieDTO> getAllMovies(Pageable pageable) {
-                logger.info("Service: Getting movies for page: {}, size: {}", pageable.getPageNumber(),
-                                pageable.getPageSize());
-                // No pageable findAllActive method, so fallback to filtering after fetching all
-                // active movies
-                List<Movie> activeMovies = movieRepo.findAll();
-                int start = (int) pageable.getOffset();
-                int end = Math.min((start + pageable.getPageSize()), activeMovies.size());
-                List<Movie> pageContent = activeMovies.subList(start, end);
-                Page<MovieDTO> movieDTOs = new PageImpl<>(
-                                pageContent.stream()
-                                                .map(movie -> modelMapper.map(movie, MovieDTO.class))
-                                                .collect(Collectors.toList()),
-                                pageable,
-                                activeMovies.size());
-                logger.info("Service: Returning {} movies for page: {}", movieDTOs.getContent().size(),
-                                movieDTOs.getNumber());
-                return movieDTOs;
+                logger.info("Service: Getting movies for page: {}, size: {}",
+                                pageable.getPageNumber(), pageable.getPageSize());
+
+                // Fetch paginated data from DB (proper JPA pagination)
+                Page<Movie> moviePage = movieRepo.findAll(pageable);
+
+                // Convert entities to DTOs using your existing MovieMapper
+                List<MovieDTO> movieDTOs = moviePage.getContent().stream()
+                                .map(MovieMapper::convertToDTO) // Uses manual conversion below
+                                .collect(Collectors.toList());
+
+                logger.info("Service: Returning {} movies for page: {}",
+                                movieDTOs.size(), pageable.getPageNumber());
+
+                return new PageImpl<>(movieDTOs, pageable, moviePage.getTotalElements());
         }
+
+        // Manual conversion using the same pattern as your MovieMapper
 
         @Override
         public MovieDTO getMovieById(Long id) {
@@ -174,7 +206,7 @@ public class MovieServiceImpl implements MovieService {
         public MovieDTO getMovieBySlug(String slug) {
                 Movie movie = movieRepo.findBySlug(slug)
                                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "slug", slug));
-                return modelMapper.map(movie, MovieDTO.class);
+                return MovieMapper.convertToDTO(movie);
         }
 
         @Override

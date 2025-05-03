@@ -14,4 +14,6 @@ public class CommentDTO {
     private Long movieId;
     private String userName;
     private String userAvatar;
+
+    private int statusDelete;
 }

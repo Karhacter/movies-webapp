@@ -15,6 +15,12 @@ import com.karhacter.movies_webapp.dto.WatchlistDTO;
 import com.karhacter.movies_webapp.service.WatchListService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
+
+import com.karhacter.movies_webapp.entity.Movie;
+import com.karhacter.movies_webapp.repository.MovieRepo;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/watchlists")
@@ -23,9 +29,12 @@ public class WatchListController {
     @Autowired
     private WatchListService watchlistService;
 
+    @Autowired
+    private MovieRepo movieRepo;
+
     @PostMapping("/add")
     public WatchlistDTO addMovieToWatchlist(
-            @org.springframework.web.bind.annotation.RequestBody com.karhacter.movies_webapp.dto.AddWatchlistRequest request) {
+            @RequestBody com.karhacter.movies_webapp.dto.AddWatchlistRequest request) {
         return watchlistService.addMovieToWatchlist(request.getUserId(), request.getMovieId());
     }
 
@@ -47,17 +56,35 @@ public class WatchListController {
     }
 
     @PostMapping("/toggle")
-    public ResponseEntity<WatchlistDTO> toggleWatchlist(@RequestParam Long userId, @RequestParam Long movieId) {
-        WatchlistDTO watchlistDTO = watchlistService.toggleWatchlist(userId, movieId);
+    public ResponseEntity<WatchlistDTO> toggleWatchlist(@RequestParam Long userId, @RequestParam String movieSlug) {
+        Optional<Movie> movieOpt = movieRepo.findBySlug(movieSlug);
+        if (movieOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Movie movie = movieOpt.get();
+        WatchlistDTO watchlistDTO = watchlistService.toggleWatchlist(userId, movie.getId());
         return new ResponseEntity<>(watchlistDTO, HttpStatus.OK);
     }
 
     @GetMapping("/status")
     public ResponseEntity<?> checkWatchlistStatus(
-            @org.springframework.web.bind.annotation.RequestParam java.util.Map<String, String> params) {
+            @RequestParam java.util.Map<String, String> params) {
         try {
             Long userId = Long.parseLong(params.get("userId"));
-            Long movieId = Long.parseLong(params.get("movieId"));
+            String movieIdStr = params.get("movieId");
+            String movieSlug = params.get("movieSlug");
+            Long movieId = null;
+            if (movieIdStr != null) {
+                movieId = Long.parseLong(movieIdStr);
+            } else if (movieSlug != null) {
+                Optional<Movie> movieOpt = movieRepo.findBySlug(movieSlug);
+                if (movieOpt.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Invalid movieSlug");
+                }
+                movieId = movieOpt.get().getId();
+            } else {
+                return ResponseEntity.badRequest().body("Missing movieId or movieSlug");
+            }
             boolean inWatchlist = watchlistService.isMovieInWatchlist(userId, movieId);
             return ResponseEntity.ok(new java.util.HashMap<String, Boolean>() {
                 {

@@ -11,6 +11,8 @@ public interface CommentService {
     // Get all comments for a specific movie
     List<CommentDTO> getCommentsByMovieId(Long movieId);
 
+    List<CommentDTO> getCommentsByMovieSlug(String slug);
+
     // Get all comments by a specific user
     List<CommentDTO> getCommentsByUserId(Long userId);
 

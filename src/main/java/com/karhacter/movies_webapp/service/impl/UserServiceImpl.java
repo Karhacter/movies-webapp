@@ -29,6 +29,7 @@ import com.karhacter.movies_webapp.entity.User;
 import com.karhacter.movies_webapp.exception.APIException;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
 import com.karhacter.movies_webapp.payloads.LoginResponse;
+import com.karhacter.movies_webapp.repository.PasswordResetTokenRepository;
 import com.karhacter.movies_webapp.repository.RoleRepo;
 import com.karhacter.movies_webapp.repository.UserRepo;
 import com.karhacter.movies_webapp.security.JwtUtil;
@@ -50,15 +51,23 @@ public class UserServiceImpl implements UserService {
 
     private final RoleRepo roleRepo;
 
+    private final com.karhacter.movies_webapp.service.EmailService emailService;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(MovieServiceImpl.class);
 
     public UserServiceImpl(UserRepo userRepo, ModelMapper modelMapper, RoleRepo roleRepo,
-            PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+            PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+            com.karhacter.movies_webapp.service.EmailService emailService,
+            PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
 
         try {
             Files.createDirectories(this.fileStorageLocation);
@@ -66,6 +75,56 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(
                     "Could not create the directory where the uploaded files will be stored.", ex);
         }
+    }
+
+    @Override
+    public void linkGoogleAccount(Long userId, String googleId) throws Exception {
+        // Check if googleId is already linked to another user
+        userRepo.findByGoogleId(googleId).ifPresent(user -> {
+            if (user.getUserID() != userId) {
+                throw new RuntimeException("Google account is already linked to another user.");
+            }
+        });
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setGoogleId(googleId);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void linkFacebookAccount(Long userId, String facebookId) throws Exception {
+        // Check if facebookId is already linked to another user
+        userRepo.findByFacebookId(facebookId).ifPresent(user -> {
+            if (user.getUserID() != userId) {
+                throw new RuntimeException("Facebook account is already linked to another user.");
+            }
+        });
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setFacebookId(facebookId);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void unlinkGoogleAccount(Long userId) throws Exception {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setGoogleId(null);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void unlinkFacebookAccount(Long userId) throws Exception {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setFacebookId(null);
+        userRepo.save(user);
     }
 
     private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
@@ -251,6 +310,24 @@ public class UserServiceImpl implements UserService {
         logger.info("Service: Returning {} movies for page: {}", userDTOs.getContent().size(),
                 userDTOs.getNumber());
         return userDTOs;
+    }
+
+    @Override
+    public void requestPasswordReset(String email) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'requestPasswordReset'");
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'resetPassword'");
+    }
+
+    @Override
+    public void changePassword(Long userId, String oldPassword, String newPassword) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
     }
 
 }

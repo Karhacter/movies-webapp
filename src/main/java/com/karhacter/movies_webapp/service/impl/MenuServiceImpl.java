@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.karhacter.movies_webapp.entity.Menu;
 import com.karhacter.movies_webapp.exception.APIException;
-import com.karhacter.movies_webapp.payloads.MenuDTO;
+import com.karhacter.movies_webapp.dto.MenuDTO;
 import com.karhacter.movies_webapp.repository.MenuRepo;
 import com.karhacter.movies_webapp.service.MenuService;
 
@@ -53,13 +53,13 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuDTO updateMenu(Long menuId, MenuDTO menuDTO) {
-       
+
         throw new UnsupportedOperationException("Unimplemented method 'updateMenu'");
     }
 
     @Override
     public String deleteMenu(Long menuId) {
-        
+
         throw new UnsupportedOperationException("Unimplemented method 'deleteMenu'");
     }
 

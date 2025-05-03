@@ -3,6 +3,7 @@ package com.karhacter.movies_webapp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.springframework.http.MediaType;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
 
@@ -59,6 +61,50 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Link Google account
+    @PostMapping("/{userId}/link/google")
+    public ResponseEntity<String> linkGoogleAccount(@PathVariable Long userId, @RequestParam String googleId) {
+        try {
+            userService.linkGoogleAccount(userId, googleId);
+            return ResponseEntity.ok("Google account linked successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Link Facebook account
+    @PostMapping("/{userId}/link/facebook")
+    public ResponseEntity<String> linkFacebookAccount(@PathVariable Long userId, @RequestParam String facebookId) {
+        try {
+            userService.linkFacebookAccount(userId, facebookId);
+            return ResponseEntity.ok("Facebook account linked successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Unlink Google account
+    @PostMapping("/{userId}/unlink/google")
+    public ResponseEntity<String> unlinkGoogleAccount(@PathVariable Long userId) {
+        try {
+            userService.unlinkGoogleAccount(userId);
+            return ResponseEntity.ok("Google account unlinked successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Unlink Facebook account
+    @PostMapping("/{userId}/unlink/facebook")
+    public ResponseEntity<String> unlinkFacebookAccount(@PathVariable Long userId) {
+        try {
+            userService.unlinkFacebookAccount(userId);
+            return ResponseEntity.ok("Facebook account unlinked successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -146,5 +192,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-
 }

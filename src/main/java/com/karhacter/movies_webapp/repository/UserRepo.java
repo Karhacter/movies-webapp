@@ -11,7 +11,13 @@ import com.karhacter.movies_webapp.entity.User;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Long> {
+
+    boolean existsByEmail(String email);
+
     @Query("SELECT u FROM User u WHERE u.email = :email")
     Optional<User> findByEmail(@Param("email") String email);
 
+    Optional<User> findByGoogleId(String googleId);
+
+    Optional<User> findByFacebookId(String facebookId);
 }

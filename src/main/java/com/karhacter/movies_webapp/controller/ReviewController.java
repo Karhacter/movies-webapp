@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.karhacter.movies_webapp.payloads.ReviewDTO;
+import com.karhacter.movies_webapp.dto.ReviewDTO;
 import com.karhacter.movies_webapp.service.ReviewService;
 
 @RestController
@@ -46,6 +46,5 @@ public class ReviewController {
         reviewService.deleteReview(reviewId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    
-    
+
 }

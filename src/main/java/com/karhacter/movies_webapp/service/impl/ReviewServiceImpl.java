@@ -13,7 +13,7 @@ import com.karhacter.movies_webapp.entity.Review;
 import com.karhacter.movies_webapp.entity.User;
 import com.karhacter.movies_webapp.exception.APIException;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
-import com.karhacter.movies_webapp.payloads.ReviewDTO;
+import com.karhacter.movies_webapp.dto.ReviewDTO;
 import com.karhacter.movies_webapp.repository.MovieRepo;
 import com.karhacter.movies_webapp.repository.ReviewRepo;
 import com.karhacter.movies_webapp.repository.UserRepo;

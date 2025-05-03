@@ -2,6 +2,7 @@ package com.karhacter.movies_webapp.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,8 +21,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Getter
-@Setter
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,14 +29,17 @@ public class Comment {
     @NotBlank
     @Lob
     private String content;
-    
+
+    @Column(name = "status_delete")
+    private int statusDelete = 1;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;

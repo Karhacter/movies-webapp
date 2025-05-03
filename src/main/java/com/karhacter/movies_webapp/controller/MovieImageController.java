@@ -6,14 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.karhacter.movies_webapp.payloads.MovieDTO;
+import com.karhacter.movies_webapp.dto.MovieDTO;
 import com.karhacter.movies_webapp.service.MovieService;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/movies/images")
-@CrossOrigin(origins = "*")
 public class MovieImageController {
 
     @Autowired

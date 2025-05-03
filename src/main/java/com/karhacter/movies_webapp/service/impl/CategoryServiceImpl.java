@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.karhacter.movies_webapp.entity.Category;
 import com.karhacter.movies_webapp.exception.APIException;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
-import com.karhacter.movies_webapp.payloads.CategoryDTO;
+import com.karhacter.movies_webapp.dto.CategoryDTO;
 import com.karhacter.movies_webapp.repository.CategoryRepo;
 import com.karhacter.movies_webapp.service.CategoryService;
 

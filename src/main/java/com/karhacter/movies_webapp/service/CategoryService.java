@@ -3,7 +3,7 @@ package com.karhacter.movies_webapp.service;
 import java.util.List;
 
 import com.karhacter.movies_webapp.entity.Category;
-import com.karhacter.movies_webapp.payloads.CategoryDTO;
+import com.karhacter.movies_webapp.dto.CategoryDTO;
 
 public interface CategoryService {
     // add new categorys

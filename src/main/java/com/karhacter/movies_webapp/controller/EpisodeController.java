@@ -33,7 +33,7 @@ public class EpisodeController {
         return new ResponseEntity<>(savedEpDTO, HttpStatus.CREATED);
     }
 
-    // Ep = episode
+
 
     @GetMapping("/index")
     public ResponseEntity<List<EpisodeDTO>> getAllCategories() {

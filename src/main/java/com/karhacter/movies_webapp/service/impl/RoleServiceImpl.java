@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.karhacter.movies_webapp.entity.Role;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
-import com.karhacter.movies_webapp.payloads.RoleDTO;
+import com.karhacter.movies_webapp.dto.RoleDTO;
 import com.karhacter.movies_webapp.repository.RoleRepo;
 import com.karhacter.movies_webapp.service.RoleService;
 

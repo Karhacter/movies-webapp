@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.karhacter.movies_webapp.repository.UserRepo;
 import com.karhacter.movies_webapp.security.JwtAuthFilter;
-import com.karhacter.movies_webapp.security.JwtService;
 import com.karhacter.movies_webapp.service.impl.UserDetailsServiceImpl;
 
 @Configuration
@@ -31,14 +30,12 @@ public class SecurityConfig {
   }
 
   @Autowired
-  private JwtService jwtService;
-
-  @Autowired
   private UserDetailsService userDetailsService;
 
-  @Bean
-  public JwtAuthFilter jwtAuthFilter() {
-    return new JwtAuthFilter(jwtService, userDetailsService);
+  private final JwtAuthFilter jwtAuthFilter;
+
+  public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    this.jwtAuthFilter = jwtAuthFilter;
   }
 
   @Bean
@@ -70,7 +67,7 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/users").hasRole("ADMIN")
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

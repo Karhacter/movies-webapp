@@ -1,6 +1,6 @@
 package com.karhacter.movies_webapp.dto;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import lombok.*;
@@ -20,8 +20,11 @@ public class MovieDTO {
     private double rating;
     private int tokens;
     private String videoUrl;
-    private CategoryDTO category;
     private List<CommentDTO> comments;
     private List<ReviewDTO> reviews;
     private List<HistoryDTO> history;
+    private Integer statusDelete;
+    private Long parentID;
+    private Integer seasonNumber;
+    private List<CategoryDTO> categories;
 }

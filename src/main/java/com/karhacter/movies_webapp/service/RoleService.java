@@ -2,7 +2,7 @@ package com.karhacter.movies_webapp.service;
 
 import java.util.List;
 
-import com.karhacter.movies_webapp.payloads.RoleDTO;
+import com.karhacter.movies_webapp.dto.RoleDTO;
 
 public interface RoleService {
     RoleDTO createRole(RoleDTO roleDTO);

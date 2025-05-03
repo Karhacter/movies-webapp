@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.karhacter.movies_webapp.payloads.AdDTO;
+import com.karhacter.movies_webapp.dto.AdDTO;
 import com.karhacter.movies_webapp.service.AdService;
 import com.karhacter.movies_webapp.entity.AdType;
 import com.karhacter.movies_webapp.entity.AdStatus;
@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/ads")
-@CrossOrigin(origins = "*")
 public class AdController {
 
     @Autowired

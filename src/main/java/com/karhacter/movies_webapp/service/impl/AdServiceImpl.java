@@ -13,7 +13,7 @@ import com.karhacter.movies_webapp.entity.AdStatus;
 import com.karhacter.movies_webapp.entity.AdType;
 import com.karhacter.movies_webapp.entity.User;
 import com.karhacter.movies_webapp.exception.ResourceNotFoundException;
-import com.karhacter.movies_webapp.payloads.AdDTO;
+import com.karhacter.movies_webapp.dto.AdDTO;
 import com.karhacter.movies_webapp.repository.AdRepo;
 import com.karhacter.movies_webapp.repository.UserRepo;
 import com.karhacter.movies_webapp.service.AdService;

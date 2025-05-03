@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.karhacter.movies_webapp.payloads.RoleDTO;
+import com.karhacter.movies_webapp.dto.RoleDTO;
 import com.karhacter.movies_webapp.service.RoleService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/roles")
 public class RoleController {
 

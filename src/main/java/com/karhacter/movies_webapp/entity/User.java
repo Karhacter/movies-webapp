@@ -26,7 +26,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -53,16 +52,16 @@ public class User implements UserDetails {
     @Pattern(regexp = "^\\d{10}$", message = "Moblie Number must contain only numbers")
     private String mobileNumber;
 
+    @Nullable
     @Email
-    @NotBlank
     @Column(unique = true, nullable = false)
     private String email;
 
     @Nullable
     private String avatar;
 
-    @NotBlank
     @Size(min = 5)
+    @Column(nullable = true)
     private String password;
 
     private int balance;
@@ -80,6 +79,15 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<History> history;
+
+    @Nullable
+    private String provider;
+
+    @Nullable
+    private String googleId;
+
+    @Nullable
+    private String facebookId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

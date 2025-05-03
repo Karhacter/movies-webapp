@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karhacter.movies_webapp.entity.Menu;
-import com.karhacter.movies_webapp.payloads.MenuDTO;
+import com.karhacter.movies_webapp.dto.MenuDTO;
 import com.karhacter.movies_webapp.service.MenuService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/menus")
 public class MenuController {
 
@@ -42,5 +41,4 @@ public class MenuController {
         return new ResponseEntity<>(menuService.getAllMenu(), HttpStatus.OK);
     }
 
-    
 }

@@ -18,4 +18,17 @@ public class UserDTO {
     private int balance;
     private LocalDateTime createdAt;
     private Set<Long> roleIds = new HashSet<>();
+
+    // Added single roleId field to hold single role ID from JSON
+    private Long roleId;
+
+    /**
+     * Converts the single roleId to the Set of roleIds.
+     * If roleId is not null, adds it to roleIds set.
+     */
+    public void convertRoleIdToRoleIds() {
+        if (this.roleId != null) {
+            this.roleIds.add(this.roleId);
+        }
+    }
 }

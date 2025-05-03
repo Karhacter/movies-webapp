@@ -19,7 +19,7 @@ public interface MovieService {
 
     Page<MovieDTO> getAllMovies(Pageable pageable);
 
-    List<MovieDTO> getMovieList();
+    Page<MovieDTO> getTrashMovie(Pageable pageable);
 
     // get one movie
     MovieDTO getMovieById(Long id);

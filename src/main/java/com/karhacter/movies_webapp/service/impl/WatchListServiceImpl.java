@@ -36,7 +36,10 @@ public class WatchListServiceImpl implements WatchListService {
     @Override
     public List<WatchlistDTO> getUserWatchlist(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        return watchlistRepo.findByUser(user);
+        List<Watchlist> watchlists = watchlistRepo.findByUser(user);
+        return watchlists.stream()
+                .map(watchlist -> new WatchlistDTO(watchlist.getId(), watchlist.getCreated_at(), watchlist.getUser().getUserID(), watchlist.getMovie().getId()))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override

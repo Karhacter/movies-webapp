@@ -1,7 +1,7 @@
 package com.karhacter.movies_webapp.service;
 
 import java.util.List;
-import com.karhacter.movies_webapp.payloads.AdDTO;
+import com.karhacter.movies_webapp.dto.AdDTO;
 import com.karhacter.movies_webapp.entity.AdType;
 import com.karhacter.movies_webapp.entity.AdStatus;
 
