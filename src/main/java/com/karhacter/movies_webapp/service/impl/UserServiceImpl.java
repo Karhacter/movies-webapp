@@ -343,8 +343,10 @@ public class UserServiceImpl implements UserService {
         passwordResetTokenRepository.save(resetToken);
 
         // Compose reset password email
-        String resetUrl = "http://localhost:8080/reset-password.html?token=" + token; // Updated to point to static HTML
-                                                                                      // page
+        String resetUrl = "https://movies-stream-b4u0.onrender.com/reset-password.html?token=" + token; // Updated to
+                                                                                                        // point to
+                                                                                                        // static HTML
+        // page
         String subject = "Password Reset Request";
         String message = "To reset your password, click the link below:\n" + resetUrl;
 

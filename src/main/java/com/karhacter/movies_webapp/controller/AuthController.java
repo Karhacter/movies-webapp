@@ -110,11 +110,11 @@ public class AuthController {
             String jwt = jwtUtil.generateToken(user);
 
             ResponseCookie cookie = ResponseCookie.from("token", jwt)
-                    .httpOnly(false) // For development only
-                    .secure(false) // For development only
+                    .httpOnly(true)
+                    .secure(true)
                     .path("/")
                     .maxAge(Duration.ofDays(1))
-                    .sameSite("Lax") // More flexible for development
+                    .sameSite("None")
                     .build();
 
             response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

@@ -50,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String token = jwtUtil.generateToken(user);
 
         // Redirect to frontend OAuth2 callback page with token as URL parameter
-        String redirectUrl = "http://localhost:5173/login-success?token=" + token;
+        String redirectUrl = "https://movies-ui-alpha.vercel.app/login-success?token=" + token;
 
         response.sendRedirect(redirectUrl);
     }
